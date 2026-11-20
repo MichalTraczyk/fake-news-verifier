@@ -1,9 +1,11 @@
 from fastapi import FastAPI
-from starlette.responses import JSONResponse
+
+from web.controllers import conversation_controller
 
 app = FastAPI()
+app.include_router(conversation_controller.router)
 
 
 @app.get("/health")
 def health():
-    return JSONResponse(status_code=200,content={"status": "ok"})
+    return {"status": "ok"}
