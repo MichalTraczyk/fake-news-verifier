@@ -18,6 +18,10 @@ def retrieve_info(query: str):
 @tool
 def save_info(fact: str, topic: str) -> str:
     """Save a new fact to the knowledge base when you are fairly confident that it's reliabke"""
+    existing = get_vector_store().similarity_search(fact, k=1)
+    if existing and existing[0].page_content.strip() == fact.strip():
+        return f"Already in the knowledge base, not saved again: {fact}"
+
     get_vector_store().add_documents([
         Document(
             page_content=fact,

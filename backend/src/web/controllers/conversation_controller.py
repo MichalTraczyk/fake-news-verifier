@@ -1,8 +1,12 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
 
 from web.repositories.conversation_repository import InMemoryConversationRepository
 from web.schemas.conversation import Conversation, Message, SendMessageRequest
 from web.services.conversation_service import ConversationService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/conversations", tags=["conversations"])
 
@@ -25,7 +29,11 @@ def get_conversation(conversation_id: str):
 
 @router.post("/{conversation_id}/messages", response_model=Message)
 def send_message(conversation_id: str, request: SendMessageRequest):
-    reply = service.send_message(conversation_id, request.content)
+    try:
+        reply = service.send_message(conversation_id, request.content)
+    except Exception as exc:
+        logger.exception("Failed to generate reply")
+        raise HTTPException(status_code=502, detail="The assistant failed to reply") from exc
     if reply is None:
         raise HTTPException(status_code=404, detail="Conversation not found")
     return reply
