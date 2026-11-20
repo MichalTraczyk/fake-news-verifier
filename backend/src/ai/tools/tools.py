@@ -17,11 +17,7 @@ def retrieve_info(query: str):
 
 @tool
 def save_info(fact: str, topic: str) -> str:
-    """Save a new fact to the knowledge base when the user explicitly tells you
-    new information they want remembered (e.g. company policies, rules, data).
-    Rewrite it as one self-contained sentence that makes sense without the chat,
-    e.g. 'Duck T. company offers 30 days of paid vacation per year.'
-    Do NOT use for questions or for facts already in the knowledge base."""
+    """Save a new fact to the knowledge base when you are fairly confident that it's reliabke"""
     get_vector_store().add_documents([
         Document(
             page_content=fact,

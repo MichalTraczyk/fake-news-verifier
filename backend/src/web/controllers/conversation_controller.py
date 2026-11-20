@@ -1,12 +1,13 @@
 from fastapi import APIRouter, HTTPException
 
-from web.repositories.conversation_repository import ConversationRepository
+from web.repositories.conversation_repository import InMemoryConversationRepository
 from web.schemas.conversation import Conversation, Message, SendMessageRequest
 from web.services.conversation_service import ConversationService
 
 router = APIRouter(prefix="/conversations", tags=["conversations"])
 
-service = ConversationService(ConversationRepository())
+# Swap InMemoryConversationRepository for a Postgres one here.
+service = ConversationService(InMemoryConversationRepository())
 
 
 @router.post("", response_model=Conversation)
