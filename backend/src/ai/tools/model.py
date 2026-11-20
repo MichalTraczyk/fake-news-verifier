@@ -47,8 +47,6 @@ def get_agent():
         model=get_model(),
         tools=[retrieve_info, save_info,{"type": "web_search"}],
         system_prompt=SYSTEM_PROMPT,
-        # No checkpointer: conversation history is owned by web's ConversationRepository
-        # and passed in full on every call.
         response_format=ChatResponse,
     )
     return agent
