@@ -27,7 +27,10 @@ class ChatResponse(BaseModel):
         description="'verification' when a claim was checked, 'clarification' when you need "
         "more details from the user, 'message' for anything else"
     )
-    message: str = Field(description="The reply shown to the user, in the user's language")
+    message: str = Field(
+        description="The reply shown to the user, in the user's language. Never empty - "
+        "for a verification, a one-sentence summary of the verdict"
+    )
     verification: VerificationResult | None = Field(
         description="Filled when type is 'verification', otherwise null"
     )

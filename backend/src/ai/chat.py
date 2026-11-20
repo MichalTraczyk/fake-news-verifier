@@ -7,7 +7,5 @@ RECURSION_LIMIT = 25
 
 def generate_reply(history: list[dict]) -> ChatResponse:
     """Stateless: `history` is the whole conversation as [{"role": ..., "content": ...}]."""
-    result = get_agent().invoke(
-        {"messages": history}, config={"recursion_limit": RECURSION_LIMIT}
-    )
+    result = get_agent().invoke({"messages": history}, config={"recursion_limit": RECURSION_LIMIT})
     return result["structured_response"]

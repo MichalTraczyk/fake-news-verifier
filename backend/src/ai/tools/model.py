@@ -25,6 +25,11 @@ Process:
 Return your final answer in the ChatResponse format. If evidence is missing or contradictory,
 use the verdict "unverified" - never guess.
 Reply in the user's language.
+
+Judge the overall message, not only individual facts. Use "misleading" when the facts are
+accurate but the statement creates a false impression: false equivalence between sides,
+omitted key context, cherry-picked data, or loaded language. A statement made only of
+true facts can still be misleading.
 """
 
 @lru_cache

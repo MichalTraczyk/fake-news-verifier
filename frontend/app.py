@@ -6,7 +6,7 @@ import streamlit as st
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 TIMEOUT = 120  # the agent may search the web, replies can take a while
 
-VERDICT_ICONS = {"true": "✅", "false": "❌", "misleading": "⚠️", "unverified": "❔"}
+ROLE_LABELS = {"user": "You", "assistant": "Verifier"}
 
 
 def create_conversation() -> str:
@@ -26,22 +26,27 @@ def send_message(conversation_id: str, content: str) -> dict:
 
 
 def show_message(message: dict) -> None:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-        verification = message.get("verification")
-        if verification:
-            icon = VERDICT_ICONS.get(verification["verdict"], "")
+    st.markdown(f"**{ROLE_LABELS[message['role']]}:** {message['content']}")
+    verification = message.get("verification")
+    if verification:
+        st.markdown(
+            f"Verdict: **{verification['verdict']}** "
+            f"(confidence {verification['confidence']:.0%})  \n"
+            f"{verification['explanation']}"
+        )
+        if verification["sources"]:
             st.markdown(
-                f"**{icon} {verification['verdict'].upper()}** "
-                f"(confidence {verification['confidence']:.0%})"
+                "Sources:\n"
+                + "\n".join(
+                    f"- [{s.get('title') or s['url']}]({s['url']})"
+                    for s in verification["sources"]
+                )
             )
-            st.caption(verification["explanation"])
-            for source in verification["sources"]:
-                st.markdown(f"- [{source.get('title') or source['url']}]({source['url']})")
+    st.divider()
 
 
-st.set_page_config(page_title="Fake News Verifier", page_icon="🔎")
-st.title("🔎 Fake News Verifier")
+st.set_page_config(page_title="Fake News Verifier")
+st.title("Fake News Verifier")
 
 if "conversation_id" not in st.session_state:
     try:
@@ -51,16 +56,16 @@ if "conversation_id" not in st.session_state:
         st.stop()
     st.session_state.messages = []
 
-with st.sidebar:
-    st.caption(f"Conversation: `{st.session_state.conversation_id}`")
-    if st.button("New conversation"):
-        del st.session_state.conversation_id
-        st.rerun()
+col_id, col_button = st.columns([3, 1])
+col_id.text(f"Conversation {st.session_state.conversation_id}")
+if col_button.button("New conversation"):
+    del st.session_state.conversation_id
+    st.rerun()
 
 for message in st.session_state.messages:
     show_message(message)
 
-if prompt := st.chat_input("Paste a claim or news to verify..."):
+if prompt := st.chat_input("Claim or news to verify"):
     user_message = {"role": "user", "content": prompt}
     st.session_state.messages.append(user_message)
     show_message(user_message)
